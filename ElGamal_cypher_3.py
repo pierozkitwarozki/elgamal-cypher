@@ -3,35 +3,33 @@ import math
 
 
 def is_prime(number):
-    # sprawdzanie czy liczba jest pierwsza
-    if number > 1:  # sprawdzam tylko jeśli jest większa od 1
+    if number > 1:
         for i in range(2, number):
-            if number % i == 0:  # jeśli ma jakiś dzielnik mniejszy od samej siebie, to funkcja się kończy i zwraca False
+            if number % i == 0:
                 return False
-        else:  # jeśli pętla się skończy bez przerwania (nie ma żadnego dzielnika) tzn że liczba jest pierwsza i True
+        else:
             return True
     else:
         return False
 
 
 def generate_random_p():
-    p = random.randint(1000, 10000)  # tu generuję randomowe inty od 1000 do 10000
+    p = random.randint(1000, 10000)
     while not is_prime(p):
-        p = random.randint(1000, 10000)  # dopóki nie wygeneruje liczby pierwszej to losuje dalej
+        p = random.randint(1000, 10000)
     return p
 
 
-def encode(text):  # zamienianie kazdego znaku w ciągu na inta z tablicy ASCII, zeby potem
-    # mozna było wykonywać na nich operacje matematyczne
+def encode(text):
     for i in text:
-        yield ord(i)  # yield to taki jakby return tylko dla każdej iteracji w pętli, nie zatrzymuje pętli
+        yield ord(i)
 
 
 def mod_exp(base, exp, modulus):
-    return pow(base, exp, modulus)  # działanie: base ^ exp % modulus
+    return pow(base, exp, modulus)
 
 
-def generate_keys():  # generowanie kluczy, wykonywanie funkcji po prostu
+def generate_keys():
     p = generate_random_p()
     a = find_primitive(p)
     x = random.randint(1, p - 1)
@@ -71,22 +69,22 @@ def find_primitive(n):
     return -1
 
 
-def encrypt(key, message):  # metoda szyfrująca
-    encoded_msg = list(encode(message))  # tu zamieniam słowa na ascii
-    pairs = []  # tu bede zapisywał pary zaszyfrowane
+def encrypt(key, message):
+    encoded_msg = list(encode(message))
+    pairs = []
     x = 1
-    for item in encoded_msg:  # dla każdego znaku takie działanie
+    for item in encoded_msg:
         y = mod_exp(key['public'][0], key['k_value'], key['public'][1])
         z = item * (mod_exp(key['public'][2], key['k_value'], key['public'][1]))
         pairs.append((y, z))
         x += 1
     encrypted_msg_str = ''
-    for i in pairs:  # łączę wszystkie pary w ciag liczb żeby się nie wyświetlało jak lista,
+    for i in pairs:
         encrypted_msg_str += str(i[0]) + str(i[1])
-    return pairs, encrypted_msg_str  # zwracam listę par i ciąg do wyświetlenia
+    return pairs, encrypted_msg_str
 
 
-def decrypt(key, message):  # no i metoda deszyfrująca
+def decrypt(key, message):
     x = key['private']
     p = key['public'][1]
     decoded_msg = ''
@@ -94,14 +92,13 @@ def decrypt(key, message):  # no i metoda deszyfrująca
         first = item[0]
         second = item[1]
         m = (second * (first ** (p - 1 - x))) % p
-        decoded_msg += str(chr(m))  # zamieniam z powrotem na stringa
+        decoded_msg += str(chr(m))
     return decoded_msg
 
 
 keys = generate_keys()
 
-# input_text = input('Enter text to encrypt: ') jak odkomentujesz, i zakomentujesz to niżej,
-# to można wprowadzać tekst z klawiatury
+# input_text = input('Enter text to encrypt: ')
 input_text = 'SzYfRRR'
 encrypted_msg, encrypted_msg_str = encrypt(keys, input_text)
 decrypted_msg = decrypt(keys, encrypted_msg)

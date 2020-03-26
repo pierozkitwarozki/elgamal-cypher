@@ -73,9 +73,12 @@ def encrypt(key, message):
     encoded_msg = list(encode(message))
     pairs = []
     x = 1
+    k = key['k_value']
+    p = key['public'][1]
     for item in encoded_msg:
-        y = mod_exp(key['public'][0], key['k_value'], key['public'][1])
-        z = item * (mod_exp(key['public'][2], key['k_value'], key['public'][1]))
+        k = random.randint(1, p - 1)
+        y = mod_exp(key['public'][0], k, p)
+        z = item * (mod_exp(key['public'][2], k, p))
         pairs.append((y, z))
         x += 1
     encrypted_msg_str = ''
@@ -99,7 +102,7 @@ def decrypt(key, message):
 keys = generate_keys()
 
 # input_text = input('Enter text to encrypt: ')
-input_text = 'SzYfRRR'
+input_text = 'SzyFRRRRRrrrr!!!!$$$'
 encrypted_msg, encrypted_msg_str = encrypt(keys, input_text)
 decrypted_msg = decrypt(keys, encrypted_msg)
 
